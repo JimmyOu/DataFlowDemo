@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Kya-1i-ipp">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="6p7-PQ-zlS">
+            <objects>
+                <navigationController id="Kya-1i-ipp" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="l6Z-fR-frw">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="Oc1-PP-riI" kind="relationship" relationship="rootViewController" id="xH2-Dk-q4R"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Muu-gF-FMc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-418" y="192"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="Lv9-Tk-8JT">
+            <objects>
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="Oc1-PP-riI" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="wfM-4i-6A7"/>
+                        <viewControllerLayoutGuide type="bottom" id="OA3-Vf-YaF"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="NRM-zu-mQ8">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入省份..." textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wcD-pU-ISz">
+                                <rect key="frame" x="16" y="75" width="343" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="6yc-ea-Ypa"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                <connections>
+                                    <outlet property="delegate" destination="Oc1-PP-riI" id="Lbi-n5-6zw"/>
+                                </connections>
+                            </textField>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="s4M-Vi-0Ni">
+                                <rect key="frame" x="0.0" y="123" width="375" height="544"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="Oc1-PP-riI" id="73f-mz-KJj"/>
+                                    <outlet property="delegate" destination="Oc1-PP-riI" id="7CO-g5-Enm"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="wcD-pU-ISz" firstAttribute="leading" secondItem="NRM-zu-mQ8" secondAttribute="leadingMargin" id="2hO-uX-B57"/>
+                            <constraint firstItem="OA3-Vf-YaF" firstAttribute="top" secondItem="s4M-Vi-0Ni" secondAttribute="bottom" id="6pJ-R5-731"/>
+                            <constraint firstItem="wcD-pU-ISz" firstAttribute="top" secondItem="wfM-4i-6A7" secondAttribute="bottom" constant="11" id="8rI-FC-XE5"/>
+                            <constraint firstItem="wcD-pU-ISz" firstAttribute="trailing" secondItem="NRM-zu-mQ8" secondAttribute="trailingMargin" id="Rt4-43-Ksd"/>
+                            <constraint firstItem="s4M-Vi-0Ni" firstAttribute="leading" secondItem="NRM-zu-mQ8" secondAttribute="leading" id="W2W-ct-DRN"/>
+                            <constraint firstItem="s4M-Vi-0Ni" firstAttribute="top" secondItem="wcD-pU-ISz" secondAttribute="bottom" constant="8" id="jDL-05-Rbh"/>
+                            <constraint firstAttribute="trailing" secondItem="s4M-Vi-0Ni" secondAttribute="trailing" id="pX0-GZ-x1y"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="51W-Ob-Rdd"/>
+                    <connections>
+                        <outlet property="tableView" destination="s4M-Vi-0Ni" id="DKz-HY-wfF"/>
+                        <outlet property="textField" destination="wcD-pU-ISz" id="J4H-RT-bX8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1Ny-ay-Q2Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="381.60000000000002" y="187.55622188905548"/>
+        </scene>
+    </scenes>
+</document>

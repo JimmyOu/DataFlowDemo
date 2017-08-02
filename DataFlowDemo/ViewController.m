@@ -16,7 +16,7 @@
 #define kScreenH [UIScreen mainScreen].bounds.size.height
 #define kCellH 50
 @interface State :NSObject<StateType,NSCopying>
-
+@property (nonatomic, assign,getter=isValidState)BOOL validState;
 @property (nonatomic, copy) NSArray *cities;
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, copy) NSArray *histories;
@@ -25,12 +25,34 @@
 
 @implementation State
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _validState = YES;
+    }
+    return self;
+}
+
 - (id)copyWithZone:(NSZone *)zone {
     State *copy = [[[self class] allocWithZone:zone] init];
     copy.cities = self.cities;
     copy.text = self.text;
     copy.histories = self.histories;
+    copy.validState = self.validState;
     return copy;
+}
+
+- (NSString *)description{
+    return [NSString stringWithFormat:@"<%@: %p, %@>",
+            [self class],
+            self,
+            @{@"validState":@(self.validState),
+              @"cities":self.cities?:[NSNull new],
+              @"text":self.cities?:[NSNull new],
+              @"histories":self.cities?:[NSNull new]
+              }
+            ];
 }
 
 @end
@@ -97,10 +119,10 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
     _store = [[Store alloc] initWithReducer:self.reducer initialState:initialState];
     __weak __typeof(self)weakSelf = self;
     
-    [_store subscribeNext:^(State *new) {
-        [weakSelf stateDidChangeWithNew:new];
+    [_store subscribeNext:^(State *old ,State *new) {
+        [weakSelf stateDidChangeWithNew:new old:old];
     }];
-    
+
     Action *fetchCitiesAction = [Action actionWithActionType:FetchCities_Action values:nil];
     [_store dispatch:fetchCitiesAction];//3
     
@@ -116,11 +138,22 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
     [self.store dispatch:clearAll];
 }
 
-- (void)stateDidChangeWithNew:(State *)new{
+- (void)stateDidChangeWithNew:(State *)new old:(State *)old{
     
-    [self.tableView reloadData];
+    NSLog(@"old = %@,new = %@",old.description,new.description);
+    
+    if (old.cities == nil || new.cities != old.cities) { //这里比较指针就好，因为经过reduce的是两个不同的state，而且属性都是不可变的。
+        NSIndexSet *set = [[NSIndexSet alloc] initWithIndex:CitiesSection];
+        [self.tableView reloadSections:set withRowAnimation:UITableViewRowAnimationFade];
+    }
+    
+    if (old.histories == nil || new.histories != old.histories) { //这里比较指针就好，因为经过reduce的是两个不同的state，而且属性都是不可变的。
+        NSIndexSet *set = [[NSIndexSet alloc] initWithIndex:HistorySection];
+        [self.tableView reloadSections:set withRowAnimation:UITableViewRowAnimationFade];
+    }
+//    [self.tableView reloadData];
     //update title
-    if (new.text == nil || new.text.length == 0) {
+    if (new.text == nil) {
         self.title = @"省";
     } else {
         self.title = new.text;
@@ -131,24 +164,27 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
     __weak __typeof(self)weakSelf = self;
     Reducer reducer = ^(id<StateType> state, id<ActionType>action){
         State *previousState = (State *)state;
-        State *currentState = previousState;
+        State *currentState = [previousState copy];
         switch (action.actionType) {
             case UpdateText_Action:
             {
                 id associateValue  = action.associateValues;
                 currentState.text = associateValue;
+                currentState.validState = YES;
                 break;
             }
             case AddCities_Action:
             {
                 id associateValue  = action.associateValues;
                 currentState.cities = associateValue;
+                currentState.validState = YES;
                 break;
             }
             case AddHistories_Action:
             {
                 id associateValue  = action.associateValues;
                 currentState.histories = associateValue;
+                currentState.validState = YES;
                 break;
             }
 
@@ -159,6 +195,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = data;
                     [weakSelf.store dispatch:action];//4
                 }];
+                currentState.validState = NO;
                 break;
             }
             case FetchAssociate_Action: {
@@ -169,6 +206,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = data;
                     [weakSelf.store dispatch:action];
                 }];
+                currentState.validState = NO;
                 break;
             }
             case FetchHistories_Action: {
@@ -178,6 +216,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = data;
                     [weakSelf.store dispatch:action];//2
                 }];
+                currentState.validState = NO;
                 break;
             }
             case ClearHistory_Action: {
@@ -187,7 +226,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = nil;
                     [weakSelf.store dispatch:action];//2
                 }];
-            
+                currentState.validState = NO;
                 break;
             }
                 
@@ -257,10 +296,14 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSString *title;
     
+    if (indexPath.section == HistorySection) {
+        title = [self titleInHistoryAtIndexPath:indexPath];
+    } else if(indexPath.section == CitiesSection) {
+        title = [self titleInCitiesAtIndexPath:indexPath];
+    }
     DetailViewController *detail = [DetailViewController new];
-    
-  NSString *title = [self titleInCitiesAtIndexPath:indexPath];
     
     detail.title = title;
     [self.navigationController pushViewController:detail animated:YES];
@@ -291,7 +334,6 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
 
 - (void)changed:(UITextField *)textFiled {
     //关联updateText
-    NSLog(@"%@",textFiled.text);
     Action *action2 = [Action actionWithActionType:UpdateText_Action values:textFiled.text];
     [self.store dispatch:action2];
 

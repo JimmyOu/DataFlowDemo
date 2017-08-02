@@ -14,13 +14,12 @@
 @end
 @protocol StateType <NSObject>
 
-@end
-@protocol CommandType <NSObject>
+@property (nonatomic, assign,getter=isValidState)BOOL validState;
 
 @end
 
 typedef id<StateType> (^Reducer)(id<StateType> state, id<ActionType>action);
-typedef void (^SubscribeBlock)(id<StateType> new);
+typedef void (^SubscribeBlock)(id<StateType> old, id<StateType> new);
 
 @interface Store : NSObject
 

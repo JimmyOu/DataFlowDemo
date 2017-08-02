@@ -39,16 +39,17 @@
 - (void)dispatch:(id<ActionType>)action {
     id<StateType> previousState = _state;
     id<StateType> nextState = self.reducer(previousState,action);
-    self.state = nextState;
-    
-    if (self.subscribers.count > 0) {
-        __weak __typeof(self)weakSelf = self;
-        [self.subscribers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            @synchronized (weakSelf) {
-                SubscribeBlock block = (SubscribeBlock)obj;
-                block(nextState);
-            }
-        }];
+    if (nextState.isValidState) {
+     self.state = nextState;
+        if (self.subscribers.count > 0) {
+            __weak __typeof(self)weakSelf = self;
+            [self.subscribers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                @synchronized (weakSelf) {
+                    SubscribeBlock block = (SubscribeBlock)obj;
+                    block(previousState,nextState);
+                }
+            }];
+        }
     }
 }
 - (NSMutableArray *)subscribers {

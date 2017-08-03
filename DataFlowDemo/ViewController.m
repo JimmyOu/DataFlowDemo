@@ -16,7 +16,6 @@
 #define kScreenH [UIScreen mainScreen].bounds.size.height
 #define kCellH 50
 @interface State :NSObject<StateType,NSCopying>
-@property (nonatomic, assign,getter=isValidState)BOOL validState;
 @property (nonatomic, copy) NSArray *cities;
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, copy) NSArray *histories;
@@ -25,21 +24,12 @@
 
 @implementation State
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        _validState = YES;
-    }
-    return self;
-}
 
 - (id)copyWithZone:(NSZone *)zone {
     State *copy = [[[self class] allocWithZone:zone] init];
     copy.cities = self.cities;
     copy.text = self.text;
     copy.histories = self.histories;
-    copy.validState = self.validState;
     return copy;
 }
 
@@ -47,7 +37,7 @@
     return [NSString stringWithFormat:@"<%@: %p, %@>",
             [self class],
             self,
-            @{@"validState":@(self.validState),
+            @{
               @"cities":self.cities?:[NSNull new],
               @"text":self.cities?:[NSNull new],
               @"histories":self.cities?:[NSNull new]
@@ -170,21 +160,18 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
             {
                 id associateValue  = action.associateValues;
                 currentState.text = associateValue;
-                currentState.validState = YES;
                 break;
             }
             case AddCities_Action:
             {
                 id associateValue  = action.associateValues;
                 currentState.cities = associateValue;
-                currentState.validState = YES;
                 break;
             }
             case AddHistories_Action:
             {
                 id associateValue  = action.associateValues;
                 currentState.histories = associateValue;
-                currentState.validState = YES;
                 break;
             }
 
@@ -195,7 +182,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = data;
                     [weakSelf.store dispatch:action];//4
                 }];
-                currentState.validState = NO;
+                currentState = nil;
                 break;
             }
             case FetchAssociate_Action: {
@@ -206,7 +193,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = data;
                     [weakSelf.store dispatch:action];
                 }];
-                currentState.validState = NO;
+                currentState = nil;
                 break;
             }
             case FetchHistories_Action: {
@@ -216,7 +203,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = data;
                     [weakSelf.store dispatch:action];//2
                 }];
-                currentState.validState = NO;
+                currentState = nil;
                 break;
             }
             case ClearHistory_Action: {
@@ -226,7 +213,7 @@ typedef NS_ENUM(NSUInteger, SectionNum) {
                     action.associateValues = nil;
                     [weakSelf.store dispatch:action];//2
                 }];
-                currentState.validState = NO;
+                currentState = nil;
                 break;
             }
                 

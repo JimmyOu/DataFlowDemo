@@ -12,9 +12,8 @@
 @property (nonatomic, assign) NSUInteger actionType;
 @property (nonatomic, strong) id associateValues;
 @end
-@protocol StateType <NSObject>
 
-@property (nonatomic, assign,getter=isValidState)BOOL validState;
+@protocol StateType <NSObject>
 
 @end
 
